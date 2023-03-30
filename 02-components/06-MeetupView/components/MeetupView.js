@@ -1,7 +1,6 @@
 import { defineComponent } from '../vendor/vue.esm-browser.js';
 import UiAlert from './UiAlert.js';
 import UiContainer from './UiContainer.js';
-//import MeetupAgendaItem from '../../05-MeetupAgenda/components/MeetupAgendaItem.js';
 import MeetupAgenda from '../../05-MeetupAgenda/components/MeetupAgenda.js';
 import MeetupInfo from '../../04-MeetupInfo/components/MeetupInfo.js';
 import MeetupDescription from '../../02-MeetupDescription/components/MeetupDescription.js';
@@ -17,7 +16,6 @@ export default defineComponent({
     MeetupDescription,
     MeetupInfo,
     MeetupAgenda,
-    //MeetupAgendaItem
   },
 
   props: {
@@ -28,7 +26,7 @@ export default defineComponent({
   },
   computed: {
     hasAgenda() {
-      return this.meetup.agenda.length > 0;
+      return this.meetup.agenda ? this.meetup.agenda.length > 0 : false;
     }
   },
 
