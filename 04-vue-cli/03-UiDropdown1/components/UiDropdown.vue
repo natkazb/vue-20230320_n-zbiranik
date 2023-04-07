@@ -22,12 +22,12 @@ export default {
 
   props: {
     options: {
-      type: Object,
-      default: () => {}
+      type: Array,
+      default: () => ([])
     },
     modelValue: {
       type: String,
-      default: undefined
+      default: () => {}
     },
     title: {
       type: String,
@@ -49,13 +49,7 @@ export default {
 
   computed: {
     hasIcon() {
-      let result = false
-      this.options.forEach(function(item) {
-        if (Object.prototype.hasOwnProperty.call(item, 'icon')) {
-          result = true
-        }
-      })
-      return result
+      return this.options.some((element) => Object.prototype.hasOwnProperty.call(element, 'icon'))
     },
     current() {
       if (this.modelValue === undefined) {
