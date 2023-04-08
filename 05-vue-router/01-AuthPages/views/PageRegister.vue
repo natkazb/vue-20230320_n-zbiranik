@@ -5,27 +5,27 @@
       <form class="form" @submit.prevent="handleSubmit">
         <UiFormGroup label="Email">
           <div class="input-group">
-            <input name="email" type="email" class="form-control" />
+            <input name="email" type="email" class="form-control"/>
           </div>
         </UiFormGroup>
         <UiFormGroup label="Имя">
           <div class="input-group">
-            <input name="fullname" type="text" class="form-control" />
+            <input name="fullname" type="text" class="form-control"/>
           </div>
         </UiFormGroup>
         <UiFormGroup label="Пароль">
           <div class="input-group">
-            <input name="password" type="password" class="form-control" />
+            <input name="password" type="password" class="form-control"/>
           </div>
         </UiFormGroup>
         <UiFormGroup label="Повтор пароля">
           <div class="input-group">
-            <input type="password" class="form-control" />
+            <input type="password" class="form-control"/>
           </div>
         </UiFormGroup>
         <UiFormGroup>
           <label class="checkbox">
-            <input type="checkbox" class="checkbox__input" />
+            <input type="checkbox" class="checkbox__input"/>
             <span class="checkbox__box"></span>
             Я согласен с условиями
           </label>
@@ -33,7 +33,9 @@
         <div class="form__buttons">
           <button type="submit" class="button button_primary">Зарегистрироваться</button>
         </div>
-        <div class="form__append">Уже есть аккаунт? <a href="/login" class="link">Войдите</a></div>
+        <div class="form__append">Уже есть аккаунт?
+          <RouterLink class="link" :to="{ name: 'login' }">Войдите</RouterLink>
+        </div>
       </form>
     </UiContainer>
   </div>
@@ -53,7 +55,7 @@ export default {
 
   methods: {
     handleSubmit() {
-      // Требуется обработать сабмит формы
+      this.$router.push({name: 'login'})
     },
   },
 };
