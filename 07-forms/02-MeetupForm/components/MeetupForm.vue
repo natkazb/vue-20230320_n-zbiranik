@@ -22,7 +22,7 @@
           <ui-image-uploader
             name="image"
             :preview="localMeetup.image"
-            @select="localMeetup.imageToUpload = $event.target.value"
+            @select="selectFile"
             @remove="localMeetup.imageToUpload = null"
           />
         </UiFormGroup>
@@ -96,6 +96,9 @@ export default {
   },
   emits: ['cancel', 'submit'],
   methods: {
+    selectFile(newFile) {
+      this.localMeetup.imageToUpload = newFile.name
+    },
     sendForm() {
       this.$emit('submit', klona(this.localMeetup))
     },
