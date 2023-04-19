@@ -1,5 +1,5 @@
 <template>
-  <form class="meetup-form" @submit="sendForm">
+  <form class="meetup-form" @submit.prevent="sendForm">
     <div class="meetup-form__content">
       <fieldset class="meetup-form__section">
         <UiFormGroup label="Название">
@@ -22,7 +22,7 @@
           <ui-image-uploader
             name="image"
             :preview="localMeetup.image"
-            @select="localMeetup.imageToUpload = $event"
+            @select="localMeetup.imageToUpload = $event.target.value"
             @remove="localMeetup.imageToUpload = null"
           />
         </UiFormGroup>
