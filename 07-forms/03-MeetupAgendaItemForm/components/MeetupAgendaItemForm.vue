@@ -1,38 +1,56 @@
 <template>
   <fieldset class="agenda-item-form">
-    <button type="button" class="agenda-item-form__remove-button">
+    <button type="button" class="agenda-item-form__remove-button" @click="remove">
       <UiIcon icon="trash" />
     </button>
 
     <UiFormGroup>
-      <UiDropdown title="Тип" :options="$options.agendaItemTypeOptions" name="type" />
+      <UiDropdown title="Тип" :options="$options.agendaItemTypeOptions" name="type" v-model="localAgendaItem.type" />
     </UiFormGroup>
 
     <div class="agenda-item-form__row">
       <div class="agenda-item-form__col">
         <UiFormGroup label="Начало">
-          <UiInput type="time" placeholder="00:00" name="startsAt" />
+          <UiInput type="time" placeholder="00:00" name="startsAt" v-model="localAgendaItem.startsAt" />
         </UiFormGroup>
       </div>
       <div class="agenda-item-form__col">
         <UiFormGroup label="Окончание">
-          <UiInput type="time" placeholder="00:00" name="endsAt" />
+          <UiInput type="time" placeholder="00:00" name="endsAt" v-model="localAgendaItem.endsAt" />
         </UiFormGroup>
       </div>
     </div>
 
-    <UiFormGroup label="Тема">
-      <UiInput name="title" />
-    </UiFormGroup>
-    <UiFormGroup label="Докладчик">
-      <UiInput name="speaker" />
-    </UiFormGroup>
-    <UiFormGroup label="Описание">
-      <UiInput multiline name="description" />
-    </UiFormGroup>
-    <UiFormGroup label="Язык">
-      <UiDropdown title="Язык" :options="$options.talkLanguageOptions" name="language" />
-    </UiFormGroup>
+    <template v-if="isTalk">
+      <UiFormGroup label="Тема">
+        <UiInput name="title" v-model="localAgendaItem.title" />
+      </UiFormGroup>
+      <UiFormGroup label="Докладчик">
+        <UiInput name="speaker" v-model="localAgendaItem.speaker" />
+      </UiFormGroup>
+      <UiFormGroup label="Описание">
+        <UiInput multiline name="description" v-model="localAgendaItem.description" />
+      </UiFormGroup>
+      <UiFormGroup label="Язык">
+        <UiDropdown title="Язык" :options="$options.talkLanguageOptions" name="language" v-model="localAgendaItem.language" />
+      </UiFormGroup>
+    </template>
+
+    <template v-if="isOther">
+      <UiFormGroup label="Заголовок">
+        <UiInput name="title" v-model="localAgendaItem.title" />
+      </UiFormGroup>
+      <UiFormGroup label="Описание">
+        <UiInput multiline name="description" v-model="localAgendaItem.description" />
+      </UiFormGroup>
+    </template>
+
+    <template v-if="!isTalk && !isOther">
+      <UiFormGroup label="Нестандартный текст (необязательно)">
+        <UiInput name="title" v-model="localAgendaItem.title" />
+      </UiFormGroup>
+    </template>
+
   </fieldset>
 </template>
 
@@ -41,6 +59,7 @@ import UiIcon from './UiIcon.vue';
 import UiFormGroup from './UiFormGroup.vue';
 import UiInput from './UiInput.vue';
 import UiDropdown from './UiDropdown.vue';
+import {klona} from "klona";
 
 const agendaItemTypeIcons = {
   registration: 'key',
@@ -88,6 +107,75 @@ export default {
     agendaItem: {
       type: Object,
       required: true,
+    },
+  },
+  emits: ['remove', 'update:agendaItem'],
+  data() {
+    return {
+      localAgendaItem: klona(this.agendaItem)
+    };
+  },
+  methods: {
+    remove() {
+      this.$emit('remove')
+    },
+    update() {
+      this.$emit('update:agendaItem', klona(this.localAgendaItem))
+    }
+  },
+  computed: {
+    isTalk() {
+      return this.localAgendaItem.type === 'talk'
+    },
+    isOther() {
+      return this.localAgendaItem.type === 'other'
+    }
+  },
+  watch: {
+    'localAgendaItem.type': {
+      handler: function() {
+        this.update()
+      }
+    },
+    'localAgendaItem.startsAt': {
+      handler: function(newValue, oldValue) {
+        const from = new Date( Date.parse('2023-01-01T' + oldValue) );
+        const to = new Date( Date.parse('2023-01-01T' + this.localAgendaItem.endsAt));
+        //console.log('from');
+        //console.log(from.toLocaleTimeString(navigator.language, {hour: '2-digit', minute:'2-digit'}))
+        //console.log('to');
+        //console.log(to.toLocaleTimeString(navigator.language, {hour: '2-digit', minute:'2-digit'}))
+        const startsNew = new Date( Date.parse('2023-01-01T' + newValue) + Math.abs(from - to));
+        //console.log('new to');
+        //console.log(startsNew.toLocaleTimeString(navigator.language, {hour: '2-digit', minute:'2-digit'}))
+        this.localAgendaItem.endsAt = startsNew.toLocaleTimeString(navigator.language, {hour: '2-digit', minute:'2-digit'})
+        this.update()
+      }
+    },
+    'localAgendaItem.endsAt': {
+      handler: function() {
+        this.update()
+      }
+    },
+    'localAgendaItem.title': {
+      handler: function() {
+        this.update()
+      }
+    },
+    'localAgendaItem.description': {
+      handler: function() {
+        this.update()
+      }
+    },
+    'localAgendaItem.speaker': {
+      handler: function() {
+        this.update()
+      }
+    },
+    'localAgendaItem.language': {
+      handler: function() {
+        this.update()
+      }
     },
   },
 };
