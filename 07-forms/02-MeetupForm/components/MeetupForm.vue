@@ -97,7 +97,8 @@ export default {
   emits: ['cancel', 'submit'],
   methods: {
     selectFile(newFile) {
-      this.localMeetup.imageToUpload = newFile.name
+      this.localMeetup.image = newFile.name
+      this.localMeetup.imageToUpload = newFile
     },
     sendForm() {
       this.$emit('submit', klona(this.localMeetup))
@@ -113,7 +114,7 @@ export default {
     },
     updateAgenda(newValue) {
       const index = this.localMeetup.agenda.findIndex(item => item.id === newValue.id);
-      this.localMeetup.agenda[index] = newValue
+      this.localMeetup.agenda[index] = klona(newValue)
     },
     removeAgenda(index) {
       this.localMeetup.agenda.splice(index, 1)
