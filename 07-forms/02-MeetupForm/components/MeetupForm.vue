@@ -97,7 +97,8 @@ export default {
   emits: ['cancel', 'submit'],
   methods: {
     selectFile(newFile) {
-      this.localMeetup.imageToUpload = newFile.name
+      this.localMeetup.image = newFile.name
+      this.localMeetup.imageToUpload = newFile
     },
     sendForm() {
       this.$emit('submit', klona(this.localMeetup))
