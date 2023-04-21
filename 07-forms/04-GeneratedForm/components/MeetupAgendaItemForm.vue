@@ -179,44 +179,26 @@ export default {
     }
   },
   watch: {
-    'localAgendaItem.type': {
-      handler: function() {
-        this.update()
-      }
-    },
     'localAgendaItem.startsAt': {
       handler: function(newValue, oldValue) {
-        const from = new Date( Date.parse('2023-01-01T' + oldValue) );
-        const to = new Date( Date.parse('2023-01-01T' + this.localAgendaItem.endsAt));
-        const startsNew = new Date( Date.parse('2023-01-01T' + newValue) + Math.abs(from - to));
-        this.localAgendaItem.endsAt = startsNew.toLocaleTimeString(navigator.language, {hour: '2-digit', minute:'2-digit'})
-        this.update()
+        const from = new Date( Date.parse('2023-01-01T' + oldValue) )
+        const to = new Date( Date.parse('2023-01-01T' + newValue))
+        let ends = 0
+        if (to >= from) {
+          ends = new Date( Date.parse('2023-01-01T' + this.localAgendaItem.endsAt) + Math.abs(from - to))
+        } else {
+          ends = new Date( Date.parse('2023-01-01T' + this.localAgendaItem.endsAt) - Math.abs(from - to))
+        }
+        const endsMinutes = ends.getMinutes()
+        const endsHours = ends.getHours()
+        this.localAgendaItem.endsAt = `${'0'.repeat(2-endsHours.toString().length)}${endsHours}:${'0'.repeat(2-endsMinutes.toString().length)}${endsMinutes}`
       }
     },
-    'localAgendaItem.endsAt': {
+    'localAgendaItem': {
       handler: function() {
         this.update()
-      }
-    },
-    'localAgendaItem.title': {
-      handler: function() {
-        this.update()
-      }
-    },
-    'localAgendaItem.description': {
-      handler: function() {
-        this.update()
-      }
-    },
-    'localAgendaItem.speaker': {
-      handler: function() {
-        this.update()
-      }
-    },
-    'localAgendaItem.language': {
-      handler: function() {
-        this.update()
-      }
+      },
+      deep: true
     },
   },
 };
