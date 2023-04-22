@@ -33,7 +33,7 @@
                                :key="agendaItem.id"
                                :agenda-item="localMeetup.agenda[index]"
                                class="meetup-form__agenda-item"
-                               @update:agendaItem="updateAgenda" @remove="removeAgenda(index)"
+                               @update:agendaItem="updateAgenda($event, index)" @remove="removeAgenda(index)"
       />
       <div class="meetup-form__append">
         <button class="meetup-form__append-button" type="button" data-test="addAgendaItem" @click="addAgenda">
@@ -112,8 +112,7 @@ export default {
       newItem.startsAt = lastItem ? lastItem.endsAt : newItem.startsAt
       this.localMeetup.agenda.push(newItem)
     },
-    updateAgenda(newValue) {
-      const index = this.localMeetup.agenda.findIndex(item => item.id === newValue.id);
+    updateAgenda(newValue, index) {
       this.localMeetup.agenda[index] = klona(newValue)
     },
     removeAgenda(index) {
