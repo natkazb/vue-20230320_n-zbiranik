@@ -1,15 +1,78 @@
 <template>
   <div class="image-uploader">
-    <label class="image-uploader__preview image-uploader__preview-loading" style="--bg-url: url('/link.jpeg')">
-      <span class="image-uploader__text">Загрузить изображение</span>
-      <input type="file" accept="image/*" class="image-uploader__input" />
+    <label class="image-uploader__preview" :class="{'image-uploader__preview-loading': loading}" :style="background"
+           @click="remove">
+      <span class="image-uploader__text">{{ additionalText }}</span>
+      <input ref="inputFile" v-bind="$attrs" type="file" accept="image/*" class="image-uploader__input"
+             @change="onChange"/>
     </label>
   </div>
 </template>
 
 <script>
+
 export default {
   name: 'UiImageUploader',
+  inheritAttrs: false,
+  props: {
+    preview: {
+      type: String,
+    },
+    uploader: {
+      type: Function,
+    },
+  },
+  data() {
+    return {
+      loading: false,
+      haveFile: !!this.preview,
+      localPreview: this.preview
+    };
+  },
+  emits: ['select', 'upload', 'error', 'remove'],
+  computed: {
+    background() {
+      return this.localPreview ? `--bg-url: url(${this.localPreview})` : ''
+    },
+    additionalText() {
+      if (this.loading) {
+        return 'Загрузка...'
+      }
+      if (this.haveFile) {
+        return 'Удалить изображение'
+      }
+      return 'Загрузить изображение'
+    }
+  },
+  methods: {
+    async onChange(event) {
+      this.$emit('select', event.target.files[0])
+      this.localPreview = URL.createObjectURL(event.target.files[0])
+      this.haveFile = true
+      if (this.uploader) {
+        this.loading = true
+        try {
+          let response = await this.uploader(event.target.files[0])
+          this.$emit('upload', response)
+        } catch (error) {
+          event.target.value = ''
+          this.haveFile = false
+          this.localPreview = undefined
+          this.$emit('error', error)
+        }
+        this.loading = false
+      }
+    },
+    remove(event) {
+      if (this.haveFile && !this.loading) {
+        event.preventDefault()
+        this.$refs.inputFile.value = ''
+        this.haveFile = false
+        this.localPreview = undefined
+        this.$emit('remove')
+      }
+    }
+  }
 };
 </script>
 

@@ -1,32 +1,30 @@
 <template>
   <fieldset class="agenda-item-form">
-    <button type="button" class="agenda-item-form__remove-button">
+    <button type="button" class="agenda-item-form__remove-button" @click="remove">
       <UiIcon icon="trash" />
     </button>
 
     <UiFormGroup>
-      <UiDropdown title="Тип" :options="$options.agendaItemTypeOptions" name="type" />
+      <UiDropdown title="Тип" :options="$options.agendaItemTypeOptions" name="type" v-model="localAgendaItem.type" />
     </UiFormGroup>
 
     <div class="agenda-item-form__row">
       <div class="agenda-item-form__col">
         <UiFormGroup label="Начало">
-          <UiInput type="time" placeholder="00:00" name="startsAt" />
+          <UiInput type="time" placeholder="00:00" name="startsAt" v-model="localAgendaItem.startsAt" />
         </UiFormGroup>
       </div>
       <div class="agenda-item-form__col">
         <UiFormGroup label="Окончание">
-          <UiInput type="time" placeholder="00:00" name="endsAt" />
+          <UiInput type="time" placeholder="00:00" name="endsAt" v-model="localAgendaItem.endsAt" />
         </UiFormGroup>
       </div>
     </div>
 
-    <UiFormGroup label="Заголовок">
-      <UiInput name="title" />
+    <UiFormGroup v-for="(oneType, index) in $options.agendaItemFormSchemas[localAgendaItem.type]" :label="oneType.label" :key="index">
+      <component :is="oneType.component" v-bind="oneType.props" props v-model="localAgendaItem[index]" />
     </UiFormGroup>
-    <UiFormGroup label="Описание">
-      <UiInput multiline name="description" />
-    </UiFormGroup>
+
   </fieldset>
 </template>
 
@@ -35,6 +33,7 @@ import UiIcon from './UiIcon.vue';
 import UiFormGroup from './UiFormGroup.vue';
 import UiInput from './UiInput.vue';
 import UiDropdown from './UiDropdown.vue';
+import {klona} from "klona";
 
 const agendaItemTypeIcons = {
   registration: 'key',
@@ -163,6 +162,43 @@ export default {
     agendaItem: {
       type: Object,
       required: true,
+    },
+  },
+  emits: ['remove', 'update:agendaItem'],
+  data() {
+    return {
+      localAgendaItem: klona(this.agendaItem)
+    };
+  },
+  methods: {
+    remove() {
+      this.$emit('remove')
+    },
+    update() {
+      this.$emit('update:agendaItem', klona(this.localAgendaItem))
+    }
+  },
+  watch: {
+    'localAgendaItem.startsAt': {
+      handler: function(newValue, oldValue) {
+        const from = new Date( Date.parse('2023-01-01T' + oldValue) )
+        const to = new Date( Date.parse('2023-01-01T' + newValue))
+        let ends = 0
+        if (to >= from) {
+          ends = new Date( Date.parse('2023-01-01T' + this.localAgendaItem.endsAt) + Math.abs(from - to))
+        } else {
+          ends = new Date( Date.parse('2023-01-01T' + this.localAgendaItem.endsAt) - Math.abs(from - to))
+        }
+        const endsMinutes = ends.getMinutes()
+        const endsHours = ends.getHours()
+        this.localAgendaItem.endsAt = `${'0'.repeat(2-endsHours.toString().length)}${endsHours}:${'0'.repeat(2-endsMinutes.toString().length)}${endsMinutes}`
+      }
+    },
+    'localAgendaItem': {
+      handler: function() {
+        this.update()
+      },
+      deep: true
     },
   },
 };
