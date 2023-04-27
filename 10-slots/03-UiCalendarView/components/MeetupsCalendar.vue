@@ -1,8 +1,10 @@
 <template>
-  <UiCalendarView>
-    <UiCalendarEvent v-if="meetups[0]" tag="a" :href="`/meetups/${meetups[0].id}`">
-      {{ meetups[0].title }}
-    </UiCalendarEvent>
+  <UiCalendarView :meetups="meetups">
+    <template #default="{ meetup }">
+      <UiCalendarEvent v-if="meetup" tag="a" :href="`/meetups/${meetup.id}`">
+        {{ meetup.title }}
+      </UiCalendarEvent>
+    </template>
   </UiCalendarView>
 </template>
 

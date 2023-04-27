@@ -1,8 +1,10 @@
 <template>
-  <UiCalendarView>
-    <div v-for="holiday in internationalHolidaysMap[0][7]" :key="holiday" class="holiday">
-      {{ holiday }}
-    </div>
+  <UiCalendarView :meetups="holidays">
+    <template #default="{ meetup }">
+      <div class="holiday">
+        {{ meetup.title }}
+      </div>
+    </template>
   </UiCalendarView>
 </template>
 
@@ -73,6 +75,19 @@ export default {
         } else {
           result[jsMonth][date].push(holiday);
         }
+      }
+      return result;
+    },
+    holidays() {
+      const result = [];
+      const year = new Date().getFullYear();
+      for (const { date, month, holiday } of this.internationalHolidays) {
+        const dateISO = new Date(`${year}-${month.toString().padStart(2, '0')}-${date.toString().padStart(2, '0')}T00:00:00.000Z`);
+        result.push({
+          date: +dateISO,
+          title: holiday,
+          __dateForDebug: dateISO,
+        })
       }
       return result;
     },
