@@ -1,5 +1,7 @@
 <template>
-  <button class="button-group__button button-group__button_active" type="button" aria-selected="false">Button</button>
+  <button class="button-group__button" :class="{'button-group__button_active': isActive}" type="button" aria-selected="false" @click="update">
+    <slot/>
+  </button>
 </template>
 
 <script>
@@ -11,6 +13,20 @@ export default {
       required: true,
     },
   },
+
+  inject: ['parentValue', 'setParentValue'],
+
+  computed: {
+    isActive() {
+      return this.value === this.parentValue.value
+    },
+  },
+
+  methods: {
+    update() {
+      this.setParentValue(this.value)
+    },
+  }
 };
 </script>
 
