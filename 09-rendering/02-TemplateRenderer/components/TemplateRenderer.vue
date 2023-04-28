@@ -1,6 +1,28 @@
 <script>
 import { compile, h } from 'vue';
 
+const Temp = {
+  name: 'Temp',
+
+  components: () => this.components,
+
+  props: {
+    template: {
+      type: String,
+      required: true,
+    },
+
+    components: {
+      type: [Object, Array],
+      default: () => [],
+    },
+  },
+
+  render() {
+    return compile(this.template);
+  },
+};
+
 export default {
   name: 'TemplateRenderer',
 
@@ -23,19 +45,13 @@ export default {
     },
   },
 
-  methods: {
-    camelize(str) {
-      return str
-        .split('-') // разбивает 'my-long-word' на массив ['my', 'long', 'word']
-        .map(
-          (word, index) => word[0].toUpperCase() + word.slice(1)
-        )
-        .join(''); // соединяет ['my', 'Long', 'Word'] в 'myLongWord'
-    }
-  },
-
   render() {
-    return h({render: compile(this.template, {isCustomElement: (tag) => !!this.components[this.camelize(tag)]}), props: {bindings: this.bindings}}, {bindings: this.bindings});
+    return h({render: compile(this.template), props: {bindings: this.bindings}}, {bindings: this.bindings});
+    /* return h(Temp, {
+      template: this.template,
+      components: this.components,
+      props: {bindings: this.bindings}
+    }); */
   },
 
 };
