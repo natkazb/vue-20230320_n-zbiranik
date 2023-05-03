@@ -4,12 +4,14 @@ import { compile, h } from 'vue';
 const Temp = {
   name: 'Temp',
 
-  components: () => this.components,
-
   props: {
     template: {
       type: String,
       required: true,
+    },
+    properties: {
+      type: Object,
+      default: () => ({}),
     },
 
     components: {
@@ -19,14 +21,12 @@ const Temp = {
   },
 
   render() {
-    return compile(this.template);
+    return h({render: compile(this.template), components: this.components, props: {bindings: this.properties}}, {bindings: this.properties});
   },
 };
 
 export default {
   name: 'TemplateRenderer',
-
-  //components: () => this.components,
 
   props: {
     template: {
@@ -46,12 +46,7 @@ export default {
   },
 
   render() {
-    return h({render: compile(this.template), props: {bindings: this.bindings}}, {bindings: this.bindings});
-    /* return h(Temp, {
-      template: this.template,
-      components: this.components,
-      props: {bindings: this.bindings}
-    }); */
+    return h(Temp, {components: this.components, properties: this.bindings, template: this.template});
   },
 
 };
