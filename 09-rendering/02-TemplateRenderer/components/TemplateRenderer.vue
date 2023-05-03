@@ -22,27 +22,7 @@ export default {
   },
 
   render() {
-    return h({
-      props: {
-        template: {
-          type: String,
-          required: true,
-        },
-        properties: {
-          type: Object,
-          default: () => ({}),
-        },
-
-        components: {
-          type: [Object, Array],
-          default: () => [],
-        },
-      },
-
-      render() {
-        return h({render: compile(this.template), components: this.components, props: {bindings: this.properties}}, {bindings: this.properties});
-      },
-    }, {components: this.components, properties: this.bindings, template: this.template});
+    return h({render: compile(this.template), components: this.components, props: {bindings: this.bindings}}, {bindings: this.bindings});
   },
 
 };
