@@ -22,9 +22,7 @@ export default {
   },
 
   render() {
-    const Temp = {
-      name: 'Temp',
-
+    return h({
       props: {
         template: {
           type: String,
@@ -44,9 +42,7 @@ export default {
       render() {
         return h({render: compile(this.template), components: this.components, props: {bindings: this.properties}}, {bindings: this.properties});
       },
-    };
-
-    return h(Temp, {components: this.components, properties: this.bindings, template: this.template});
+    }, {components: this.components, properties: this.bindings, template: this.template});
   },
 
 };
