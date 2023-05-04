@@ -11,4 +11,16 @@ export function useProgress() {
 
 export function createProgress({ container, router } = {}) {
   // Решение
+  const addDefaultContainer = () => document.body.appendChild(document.createElement('div'));
+  const progressBarInstance = createApp(TheTopProgressBar).mount(container ?? addDefaultContainer());
+  const progressBar = {
+    start: progressBarInstance.start,
+    finish: progressBarInstance.finish,
+    fail: progressBarInstance.fail,
+    install(app) {
+      app.provide(PROGRESS_KEY, progressBar);
+    },
+  };
+
+  return progressBar;
 }
