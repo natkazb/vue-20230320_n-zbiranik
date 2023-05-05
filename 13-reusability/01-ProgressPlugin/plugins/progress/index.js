@@ -22,5 +22,17 @@ export function createProgress({ container, router } = {}) {
     },
   };
 
+  if (router) {
+    router.beforeEach((to, from, next) => {
+      progressBar.start(to)
+    })
+    router.afterEach((to, from, next) => {
+      progressBar.finish(to)
+    })
+    router.onError((to, from, next) => {
+      progressBar.fail()
+    })
+  }
+
   return progressBar;
 }
