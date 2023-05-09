@@ -9,11 +9,11 @@
     </div>
 
     <div class="calendar-view__grid">
-      <div v-for="(date, index) in dates" class="calendar-view__cell" :class="{'calendar-view__cell_inactive': !date.active}" :tabindex="index" :key="index">
+      <div v-for="(date, index) in formatDates" class="calendar-view__cell" :class="{'calendar-view__cell_inactive': !date.active}" :tabindex="index" :key="index">
         <div class="calendar-view__cell-day">{{ date.day }}</div>
         <div class="calendar-view__cell-content">
-          <template v-for="meetup in date.meetups">
-            <slot :meetup="meetup" />
+          <template v-for="event in date.events">
+            <slot :event="event" />
           </template>
         </div>
       </div>
@@ -22,11 +22,17 @@
 </template>
 
 <script>
+import {klona} from "klona";
+
+const MAP_DAYS = {0: 7, 1: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 6}
+
 export default {
-  name: 'MeetupsCalendar',
+  name: 'UiCalendarView',
+
+  emits: ['update:modelValue'],
 
   props: {
-    meetups: {
+    dates: {
       type: Array,
       required: true,
     },
@@ -45,50 +51,39 @@ export default {
         year: 'numeric',
       })
     },
-    dates() {
-      const mapDays = {0: 7, 1: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 6}
+    formatDates() {
+      //console.log(this.dates)
       const lastDayMonth = new Date(this.currentMonth.getFullYear(), this.currentMonth.getMonth() + 1, 0, 23,59,59,0)
-      const days = lastDayMonth.getDate()
-      let dates = new Array(days)
-      const currentMonthMeetups = this.meetups.filter(elem => elem.date >= this.currentMonth && elem.date <= lastDayMonth)
-      for (let i=0; i<days; i++) {
-        dates[i] = {
-          day: i+1,
-          active: true,
-          meetups: []
-        }
-      }
-      currentMonthMeetups.forEach((element) => {
-        const day = new Date(element.date).getDate()
-        dates[day-1].meetups.push(element)
-      })
-      const firstDay = mapDays[this.currentMonth.getDay()]
+      const firstDay = MAP_DAYS[this.currentMonth.getDay()]
+      let newDates = klona(this.dates)
       let lastDayPrevMonth = new Date(this.currentMonth.getFullYear(), this.currentMonth.getMonth(), 0).getDate()
       // добавить в начало дни предыдущего месяца
       for (let i=0; i<(firstDay-1); i++) {
-        dates.unshift({
+        newDates.unshift({
           day: lastDayPrevMonth--,
           active: false,
         })
       }
-      const lastDay = mapDays[lastDayMonth.getDay()]
+      const lastDay = MAP_DAYS[lastDayMonth.getDay()]
       // добавить в конец дни следующего месяца
       for (let i=0; i<(7-lastDay); i++) {
-        dates.push({
+        newDates.push({
           day: i+1,
           active: false,
         })
       }
-      return dates
+      return newDates
     }
   },
 
   methods: {
     prevMonth() {
       this.currentMonth = new Date(this.currentMonth.setMonth(this.currentMonth.getMonth()-1));
+      this.$emit('update:modelValue', this.currentMonth);
     },
     nextMonth() {
       this.currentMonth = new Date(this.currentMonth.setMonth(this.currentMonth.getMonth()+1));
+      this.$emit('update:modelValue', this.currentMonth);
     }
   }
 };

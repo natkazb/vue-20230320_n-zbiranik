@@ -1,8 +1,8 @@
 <template>
-  <UiCalendarView :meetups="holidays">
-    <template #default="{ meetup }">
+  <UiCalendarView :dates="holidays" v-model="currentMonth">
+    <template #default="{ event }">
       <div class="holiday">
-        {{ meetup.title }}
+        {{ event }}
       </div>
     </template>
   </UiCalendarView>
@@ -59,6 +59,7 @@ export default {
         { date: 17, month: 11, holiday: 'World Prematurity Day' },
         { date: 19, month: 11, holiday: "International Men's Day" },
       ],
+      currentMonth: new Date(new Date().getFullYear(), new Date().getMonth(), 1, 0, 0, 0, 0)
     };
   },
 
@@ -79,17 +80,21 @@ export default {
       return result;
     },
     holidays() {
-      const result = [];
-      const year = new Date().getFullYear();
-      for (const { date, month, holiday } of this.internationalHolidays) {
-        const dateISO = new Date(`${year}-${month.toString().padStart(2, '0')}-${date.toString().padStart(2, '0')}T00:00:00.000Z`);
-        result.push({
-          date: +dateISO,
-          title: holiday,
-          __dateForDebug: dateISO,
-        })
+      const lastDayMonth = new Date(this.currentMonth.getFullYear(), this.currentMonth.getMonth() + 1, 0, 23,59,59,0)
+      const days = lastDayMonth.getDate()
+      const newHolidays = new Array(days)
+      for (let i=0; i<days; i++) {
+        newHolidays[i] = {
+          day: i+1,
+          active: true,
+          events: []
+        }
       }
-      return result;
+      const currentHolidays = this.internationalHolidays.filter(item => item.month === this.currentMonth.getMonth() + 1)
+      currentHolidays.forEach((element) => {
+        newHolidays[element.date - 1].events.push(element.holiday)
+      })
+      return newHolidays
     },
   },
 };
